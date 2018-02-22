@@ -26,6 +26,7 @@ class App extends Component {
             if (!isDrawing) {
                 return; //stops func when not mousedown
             }
+            ctx.lineWidth = store.getState().thickness;
             console.log(store.getState());
             let hue = store.getState().hue;
             console.log(hue);
@@ -38,7 +39,7 @@ class App extends Component {
             ctx.stroke();
             [lastX, lastY] = [e.offsetX, e.offsetY];
 
-            drawWidth();
+            //drawWidth();
         }
 
         function drawWidth() {

@@ -1,0 +1,64 @@
+html {
+    background-color: #020202;
+}
+
+#container {
+    background-color: #1b2b39;
+    border-bottom: 2px solid slategrey;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 20%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+#footer {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width:20%;
+}
+#footer div {
+    color: #aaa;
+    padding: 20px;
+    font-size: 15px;
+    box-sizing: border-box;
+    font-weight: 300;
+    text-align: center;
+    width: 360px;
+}
+
+@media only screen and (min-width: 1080px) and (min-height: 500px) {
+    #footer {
+        position: fixed;
+        top: 10px;
+        left: 2%;
+    }
+    #footer div {
+        width: auto;
+    }
+}
+
+svg {
+    fill: none;
+    stroke-width: 20px;
+}
+
+.marker {
+    stroke-width: 40px;
+}
+
+text {
+    font-size: 90px;
+    stroke-width: 0px;
+    user-select: none;
+}
+.label {
+    font-size: 25px;
+    stroke-width: 0;
+}

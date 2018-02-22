@@ -7,13 +7,15 @@ import 'rxjs/add/operator/takeUntil';
 import "rxjs/add/operator/map";
 import { createStore } from 'redux';
 import { connect } from 'react-redux';
+import './panel.css';
 
-
-const Container = ({hue, saturation, lightness, red, green, blue, hex, setHue, setSaturation, setLightness}) => {
+//Main wrap for all sub components
+const Container = ({hue, saturation, lightness, thickness, red, green, blue, hex, setHue, setSaturation, setLightness, setThickness}) => {
     return <div id='container'>
         <Hue hue={hue} saturation={saturation} lightness={lightness} setHue={setHue} />
         <Saturation hue={hue} saturation={saturation} lightness={lightness} setSaturation={setSaturation} />
         <Lightness hue={hue} saturation={saturation} lightness={lightness} setLightness={setLightness} />
+        <Thickness hue={hue} saturation={saturation} lightness={lightness} thickness={thickness} setThickness={setThickness} />
         <div id='footer'>
             <div>
                 {`hsl(${hue}, ${saturation}%, ${lightness}%)`}
@@ -28,16 +30,18 @@ const Container = ({hue, saturation, lightness, red, green, blue, hex, setHue, s
     </div>;
 }
 
+//Hue Selector
 class Hue extends React.Component {
     constructor({hue, saturation, lightness, setHue}) {
         super();
 
+        //Size the circle - unused currently
         const padding = 60;
-        const innerSize = 300;
+        const innerSize = 130;
         this.radius = innerSize/2;
         this.outerSize = innerSize + padding;
-        this.centerOffset = this.outterSize/2;
-
+        this.centerOffset = this.outerSize/2;
+        console.log(this.radius + "\n" + this.outerSize);
         this.state = {
             dragging: false
         }
@@ -54,8 +58,8 @@ class Hue extends React.Component {
                  viewBox={`0 0 ${this.outerSize} ${this.outerSize}`}
                  xmlns="http://www.w3.org/2000/svg" version="1.1">
 
-                <g transform="translate(180,180)">
-                    {Array.from({length: 360}, (value, key) => (
+                <g transform={`translate(${this.centerOffset},${this.centerOffset})`}>
+                    {Array.from({length: 360}, (value, key) => ( //Generate a slice for each degree, representing each possible hue
                         <HueSlice
                             degree={key}
                             radius={this.radius}
@@ -63,13 +67,13 @@ class Hue extends React.Component {
                             marker={false} />
                     ))}
                     <g ref={(selector) => { this.selector = selector; }} >
-                        <HueSlice
+                        <HueSlice //Create the slider to select a hue
                             degree={this.props.hue}
                             radius={this.radius}
                             color={this.state.dragging ? `hsl(${this.props.hue}, ${this.props.saturation}%, ${this.props.lightness}%)` : "white"}
                             marker={true}/>
                     </g>
-                    <text
+                    <text //Display the hue value, in the current hsl color
                         x="10"
                         y="30"
                         textAnchor="middle"
@@ -77,7 +81,7 @@ class Hue extends React.Component {
                         stroke={`hsl(${this.props.hue}, ${this.props.saturation}%, ${this.props.lightness}%)`}>
                         {this.props.hue}°
                     </text>
-                    <text
+                    <text //Hue label, also in current hsl
                         className="label"
                         x="0"
                         y="60"
@@ -94,6 +98,7 @@ class Hue extends React.Component {
 
     componentDidMount() {
         // Event handling using Reactive JS
+        //FromEvent creates an Observable from DOM events, or Node.js EventEmitter events or others.
         let mouseDowns = Rx.Observable.fromEvent(this.selector, "mousedown");
         let mouseMoves = Rx.Observable.fromEvent(this.canvas, "mousemove");
         let mouseUps = Rx.Observable.fromEvent(this.canvas, "mouseup");
@@ -104,8 +109,8 @@ class Hue extends React.Component {
         let touchEnds = Rx.Observable.fromEvent(this.canvas, "touchend");
 
         let mouseDrags = mouseDowns.concatMap(clickEvent => {
-            const xMouseShouldBe = Math.sin(this.props.hue/180*Math.PI)*this.radius;
-            const yMouseShouldBe = -Math.cos(this.props.hue/180*Math.PI)*this.radius;
+            const xMouseShouldBe = Math.sin(this.props.hue*(Math.PI/180))*this.radius;
+            const yMouseShouldBe = -Math.cos(this.props.hue*(Math.PI/180))*this.radius;
             const xMouseIs = clickEvent.clientX;
             const yMouseIs = clickEvent.clientY;
             const xMouseDelta = xMouseIs - xMouseShouldBe;
@@ -160,14 +165,14 @@ const HueSlice = ({degree, color, radius, marker}) => {
     const endX    =   Math.sin((degree+thickness)/180*Math.PI)*radius;
     const endY    = - Math.cos((degree+thickness)/180*Math.PI)*radius;
     return <path
-        className={marker && 'marker'}
+        className={marker && 'marker'} //If marker set class as marker
         d={`M ${startX} ${startY} A ${radius} ${radius} 0 0 1 ${endX} ${endY}`}
         stroke={color} />
 }
 
 const Saturation = ({hue, saturation, lightness, setSaturation}) => {
     const gradient = <linearGradient id="Saturation" x1="0" x2="0" y1="0" y2="1">
-        <stop npm offset="0%" stopColor={`hsl(${hue}, 100%, ${lightness}%)`}/>
+        <stop offset="0%" stopColor={`hsl(${hue}, 100%, ${lightness}%)`}/>
         <stop offset="100%" stopColor={`hsl(${hue}, 0%, ${lightness}%)`}/>
     </linearGradient>;
     return <Percentage
@@ -188,6 +193,16 @@ const Lightness = ({hue, saturation, lightness, setLightness}) => {
         set={setLightness} />
 }
 
+const Thickness = ({hue, saturation, lightness, thickness, setThickness}) => {
+    const gradient = <linearGradient id="Thickness" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stopColor={`hsl(${hue}, ${saturation}%, ${lightness}%)`}/>
+    </linearGradient>;
+    return <Percentage
+        type="Thickness" value={thickness} gradient={gradient}
+        hue={hue} saturation={saturation} lightness={lightness}
+        set={setThickness} />
+}
+
 class Percentage extends React.Component {
     constructor({type, value, gradient, hue, saturation, lightness, set}) {
         super({type, value, gradient, hue, saturation, lightness, set});
@@ -196,7 +211,7 @@ class Percentage extends React.Component {
         this.padding = padding/2;
         const innerSize = 300;
         this.innerSize = innerSize;
-        this.outterSize = innerSize + padding;
+        this.outerSize = innerSize + padding;
         this.barOffsetX = innerSize - 20;
 
         this.state = {
@@ -211,8 +226,8 @@ class Percentage extends React.Component {
     render() {
         return (
             <svg ref={(canvas) => { this.canvas = canvas; }}
-                 width={this.outterSize} height={this.outterSize}
-                 viewBox={`0 0 ${this.outterSize} ${this.outterSize}`}
+                 width={this.outerSize/2} height={this.outerSize/2}
+                 viewBox={`0 0 ${this.outerSize} ${this.outerSize}`}
                  xmlns="http://www.w3.org/2000/svg" version="1.1">
                 <defs>
                     {this.props.gradient}
@@ -316,6 +331,7 @@ const initialState = {
     hue: 158,
     saturation: 100,
     lightness: 53,
+    thickness: 50,
     red: 15,
     green: 255,
     blue: 167,
@@ -367,6 +383,10 @@ const mainReducer = (state = initialState, action) => {
             [red, green, blue] = hsl2rgb(state.hue, state.saturation, action.value);
             hex = rgb2hex(red, green, blue);
             return Object.assign({}, state, { lightness: action.value, red, green, blue, hex });
+        case 'THICKNESS':
+            [red, green, blue] = hsl2rgb(state.hue, state.saturation, state.lightness);
+            hex = rgb2hex(red, green, blue);
+            return Object.assign({}, state, { thickness: action.value, red, green, blue, hex });
         default:
             return state;
     }
@@ -386,6 +406,7 @@ const mapStateToProps = (state, ownProps) => {
         hue: state.hue,
         saturation: state.saturation,
         lightness: state.lightness,
+        thickness: state.thickness,
         red: state.red,
         green: state.green,
         blue: state.blue,
@@ -410,6 +431,12 @@ const mapDispatchToProps = (dispatch, ownProps) => {
         setLightness: (value) => {
             dispatch({
                 type: 'LIGHTNESS',
+                value
+            })
+        },
+        setThickness: (value) => {
+            dispatch({
+                type: 'THICKNESS',
                 value
             })
         }
