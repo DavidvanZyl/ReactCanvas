@@ -19,39 +19,21 @@ class App extends Component {
         let isDrawing = false;
         let lastX = 0;
         let lastY = 0;
-        let direction = false;
-        //let hue = 0;
 
         function draw(e) {
             if (!isDrawing) {
                 return; //stops func when not mousedown
-            }
-            console.log(store.getState());
-            let hue = store.getState().hue;
-            console.log(hue);
-            let sat = store.getState().saturation;
-            let lit = store.getState().light;
+            };
+            const thickness = store.getState().thickness;
+            ctx.lineWidth = thickness;
             ctx.strokeStyle = store.getState().hex;
             ctx.beginPath();
             ctx.moveTo(lastX, lastY);
             ctx.lineTo(e.offsetX, e.offsetY);
             ctx.stroke();
             [lastX, lastY] = [e.offsetX, e.offsetY];
-
-            drawWidth();
         }
 
-        function drawWidth() {
-            // if (hue >= 360) hue = 0;
-            if (ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
-                direction = !direction;
-            }
-            if (direction) {
-                ctx.lineWidth++;
-            } else {
-                ctx.lineWidth--;
-            }
-        }
 
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mousedown', (e) => {
@@ -78,5 +60,3 @@ class App extends Component {
 }
 
 export default App;
-
-

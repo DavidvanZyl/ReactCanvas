@@ -9,14 +9,15 @@ import { createStore } from 'redux';
 import { connect } from 'react-redux';
 
 
-const Container = ({hue, saturation, lightness, red, green, blue, hex, setHue, setSaturation, setLightness}) => {
+const Container = ({hue, saturation, lightness, red, green, blue, hex, thickness, setHue, setSaturation, setLightness, setThickness}) => {
     return <div id='container'>
         <Hue hue={hue} saturation={saturation} lightness={lightness} setHue={setHue} />
         <Saturation hue={hue} saturation={saturation} lightness={lightness} setSaturation={setSaturation} />
         <Lightness hue={hue} saturation={saturation} lightness={lightness} setLightness={setLightness} />
+        <Thickness hue={hue} saturation={saturation} lightness={lightness} thickness={thickness} setThickness={setThickness} />
         <div id='footer'>
             <div>
-                {`hsl(${hue}, ${saturation}%, ${lightness}%)`}
+                {`hsl(${hue}, ${saturation}%, ${lightness}%), thickness: ${thickness}%`}
             </div>
             <div>
                 {`rgb(${red}, ${green}, ${blue})`}
@@ -29,8 +30,8 @@ const Container = ({hue, saturation, lightness, red, green, blue, hex, setHue, s
 }
 
 class Hue extends React.Component {
-    constructor({hue, saturation, lightness, setHue}) {
-        super();
+    constructor({hue, saturation, lightness, thickness, setHue}) {
+        super({hue, saturation, lightness, thickness, setHue});
 
         const padding = 60;
         const innerSize = 300;
@@ -57,6 +58,7 @@ class Hue extends React.Component {
                 <g transform="translate(180,180)">
                     {Array.from({length: 360}, (value, key) => (
                         <HueSlice
+                            key={key}
                             degree={key}
                             radius={this.radius}
                             color={`hsl(${key}, ${this.props.saturation}%, ${this.props.lightness}%)`}
@@ -114,7 +116,7 @@ class Hue extends React.Component {
                 const xRelativeToCenter = moveEvent.clientX-xMouseDelta;
                 const yRelativeToCenter = moveEvent.clientY-yMouseDelta;
                 const degree = Math.atan(yRelativeToCenter/xRelativeToCenter)*180/Math.PI + 90 + (xRelativeToCenter>=0 ? 0 : 180);
-                return parseInt(degree);
+                return parseInt(degree, 10);
             })
         });
 
@@ -131,7 +133,7 @@ class Hue extends React.Component {
                 const xRelativeToCenter = moveEvent.touches[0].clientX-xTouchDelta;
                 const yRelativeToCenter = moveEvent.touches[0].clientY-yTouchDelta;
                 const degree = Math.atan(yRelativeToCenter/xRelativeToCenter)*180/Math.PI + 90 + (xRelativeToCenter>=0 ? 0 : 180);
-                return parseInt(degree);
+                return parseInt(degree, 10);
             })
         });
 
@@ -160,14 +162,14 @@ const HueSlice = ({degree, color, radius, marker}) => {
     const endX    =   Math.sin((degree+thickness)/180*Math.PI)*radius;
     const endY    = - Math.cos((degree+thickness)/180*Math.PI)*radius;
     return <path
-        className={marker && 'marker'}
+        className={marker ? 'marker' : ''}
         d={`M ${startX} ${startY} A ${radius} ${radius} 0 0 1 ${endX} ${endY}`}
         stroke={color} />
 }
 
 const Saturation = ({hue, saturation, lightness, setSaturation}) => {
     const gradient = <linearGradient id="Saturation" x1="0" x2="0" y1="0" y2="1">
-        <stop npm offset="0%" stopColor={`hsl(${hue}, 100%, ${lightness}%)`}/>
+        <stop offset="0%" stopColor={`hsl(${hue}, 100%, ${lightness}%)`}/>
         <stop offset="100%" stopColor={`hsl(${hue}, 0%, ${lightness}%)`}/>
     </linearGradient>;
     return <Percentage
@@ -188,9 +190,20 @@ const Lightness = ({hue, saturation, lightness, setLightness}) => {
         set={setLightness} />
 }
 
+const Thickness = ({hue, saturation, lightness, thickness, setThickness}) => {
+    const gradient = <linearGradient id="Thickness" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stopColor={`hsl(${hue}, ${saturation}%, ${lightness}%)`}/>
+        <stop offset="100%" stopColor={`hsl(${hue}, ${saturation}%, ${lightness}%)`}/>
+    </linearGradient>;
+    return <Percentage
+        type="Thickness" value={thickness} gradient={gradient}
+        hue={hue} saturation={saturation} lightness={lightness} thickness={thickness}
+        set={setThickness} />
+}
+
 class Percentage extends React.Component {
-    constructor({type, value, gradient, hue, saturation, lightness, set}) {
-        super({type, value, gradient, hue, saturation, lightness, set});
+    constructor({type, value, gradient, hue, saturation, lightness, thickness, set}) {
+        super({type, value, gradient, hue, saturation, lightness, thickness, set});
 
         const padding = 60;
         this.padding = padding/2;
@@ -223,7 +236,7 @@ class Percentage extends React.Component {
                           strokeWidth="20"
                           fill={`url(#${this.props.type})`}/>
                     <g ref={(selector) => { this.selector = selector; }}>
-                        <rect x={this.barOffsetX-10} y={this.innerSize*(1-this.props.value/100) -25/2}
+                          <rect x={this.barOffsetX-10} y={this.innerSize*(1-this.props.value/100) -25/2}
                               width="40" height="25"
                               strokeWidth="20"
                               fill={this.state.dragging ? `hsl(${this.props.hue}, ${this.props.saturation}%, ${this.props.lightness}%)` : "white"}/>
@@ -271,7 +284,7 @@ class Percentage extends React.Component {
                 let percentage = (1-y/this.innerSize)*100;
                 percentage = Math.min(percentage, 100);
                 percentage = Math.max(percentage, 0);
-                return parseInt(percentage);
+                return parseInt(percentage, 10);
             })
         });
 
@@ -286,7 +299,7 @@ class Percentage extends React.Component {
                 let percentage = (1-y/this.innerSize)*100;
                 percentage = Math.min(percentage, 100);
                 percentage = Math.max(percentage, 0);
-                return parseInt(percentage);
+                return parseInt(percentage, 10);
             })
         });
 
@@ -316,6 +329,7 @@ const initialState = {
     hue: 158,
     saturation: 100,
     lightness: 53,
+    thickness: 50,
     red: 15,
     green: 255,
     blue: 167,
@@ -329,12 +343,12 @@ const hsl2rgb = (hue, saturation, lightness) => {
     const X = C * (1 - Math.abs((hue / 60) % 2 - 1));
     const m = lightness - C/2;
     let [R, G, B] =
-    0 <= hue && hue <  60 && [C, X, 0] ||
-    60 <= hue && hue < 120 && [X, C, 0] ||
-    120 <= hue && hue < 180 && [0, C, X] ||
-    180 <= hue && hue < 240 && [0, X, C] ||
-    240 <= hue && hue < 300 && [X, 0, C] ||
-    300 <= hue && hue < 360 && [C, 0, X];
+    (0 <= hue && hue <  60 && [C, X, 0]) ||
+    (60 <= hue && hue < 120 && [X, C, 0]) ||
+    (120 <= hue && hue < 180 && [0, C, X]) ||
+    (180 <= hue && hue < 240 && [0, X, C]) ||
+    (240 <= hue && hue < 300 && [X, 0, C]) ||
+    (300 <= hue && hue < 360 && [C, 0, X]);
     [R, G, B] = [(R+m)*255, (G+m)*255, (B+m)*255];
     return [Math.round(R), Math.round(G), Math.round(B)];
 }
@@ -367,6 +381,10 @@ const mainReducer = (state = initialState, action) => {
             [red, green, blue] = hsl2rgb(state.hue, state.saturation, action.value);
             hex = rgb2hex(red, green, blue);
             return Object.assign({}, state, { lightness: action.value, red, green, blue, hex });
+        case 'THICKNESS':
+            [red, green, blue] = hsl2rgb(state.hue, state.saturation, state.lightness);
+            hex = rgb2hex(red, green, blue);
+            return Object.assign({}, state, { thickness: action.value, red, green, blue, hex });
         default:
             return state;
     }
@@ -386,6 +404,7 @@ const mapStateToProps = (state, ownProps) => {
         hue: state.hue,
         saturation: state.saturation,
         lightness: state.lightness,
+        thickness: state.thickness,
         red: state.red,
         green: state.green,
         blue: state.blue,
@@ -412,6 +431,12 @@ const mapDispatchToProps = (dispatch, ownProps) => {
                 type: 'LIGHTNESS',
                 value
             })
+        },
+        setThickness: (value) => {
+            dispatch({
+                type: 'THICKNESS',
+                value
+            })
         }
     }
 }
@@ -424,5 +449,3 @@ export const ConnectedContainer = connect(mapStateToProps, mapDispatchToProps)(C
 /*********
  * REACT DOM + REDUX
  **********/
-
-
