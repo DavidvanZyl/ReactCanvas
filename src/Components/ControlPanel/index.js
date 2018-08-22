@@ -31,7 +31,7 @@ const Container = ({hue, saturation, lightness, red, green, blue, hex, thickness
 
 class Hue extends React.Component {
     constructor({hue, saturation, lightness, thickness, setHue}) {
-        super({hue, saturation, lightness, thickness, setHue});
+        super({hue, saturation, lightness, thickness, setHue} );
 
         const padding = 60;
         const innerSize = 300;
@@ -73,7 +73,7 @@ class Hue extends React.Component {
                     </g>
                     <text
                         x="10"
-                        y="30"
+                        y="10"
                         textAnchor="middle"
                         fill={`hsl(${this.props.hue}, ${this.props.saturation}%, ${this.props.lightness}%)`}
                         stroke={`hsl(${this.props.hue}, ${this.props.saturation}%, ${this.props.lightness}%)`}>
@@ -82,7 +82,7 @@ class Hue extends React.Component {
                     <text
                         className="label"
                         x="0"
-                        y="60"
+                        y="40"
                         textAnchor="middle"
                         fill={`hsl(${this.props.hue}, ${this.props.saturation}%, ${this.props.lightness}%)`}
                         stroke={`hsl(${this.props.hue}, ${this.props.saturation}%, ${this.props.lightness}%)`}>
@@ -207,7 +207,7 @@ class Percentage extends React.Component {
 
         const padding = 60;
         this.padding = padding/2;
-        const innerSize = 300;
+        const innerSize = 150;
         this.innerSize = innerSize;
         this.outterSize = innerSize + padding;
         this.barOffsetX = innerSize - 20;
@@ -242,8 +242,8 @@ class Percentage extends React.Component {
                               fill={this.state.dragging ? `hsl(${this.props.hue}, ${this.props.saturation}%, ${this.props.lightness}%)` : "white"}/>
                     </g>
                     <text
-                        x="130"
-                        y="180"
+                        x="40"
+                        y="75"
                         textAnchor="middle"
                         fill={`hsl(${this.props.hue}, ${this.props.saturation}%, ${this.props.lightness}%)`}
                         stroke={`hsl(${this.props.hue}, ${this.props.saturation}%, ${this.props.lightness}%)`}>
@@ -251,8 +251,8 @@ class Percentage extends React.Component {
                     </text>
                     <text
                         className="label"
-                        x="130"
-                        y="210"
+                        x="40"
+                        y="110"
                         textAnchor="middle"
                         fill={`hsl(${this.props.hue}, ${this.props.saturation}%, ${this.props.lightness}%)`}
                         stroke={`hsl(${this.props.hue}, ${this.props.saturation}%, ${this.props.lightness}%)`}>
