@@ -326,14 +326,14 @@ class Percentage extends React.Component {
  **********/
 
 const initialState = {
-    hue: 158,
+    hue: 169,
     saturation: 100,
     lightness: 53,
     thickness: 50,
     red: 15,
     green: 255,
-    blue: 167,
-    hex: "#0FFFA7"
+    blue: 211,
+    hex: "#0FFFD3"
 };
 
 const hsl2rgb = (hue, saturation, lightness) => {
