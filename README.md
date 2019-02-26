@@ -20,7 +20,7 @@ Once you've downloaded or cloned the repo all you need to do is run:
 
 ### `npm i`
 
-## Running a development environment
+### Running a development environment
 
 ### `npm start`
 
@@ -28,15 +28,15 @@ Runs the app in the development mode.<br>
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 
-## Built With
+### Built With
 
 * [ReactJS](https://reactjs.org/docs/getting-started.html) - a JavaScript library for building user interfaces
 * [ReduxJS](https://redux.js.org/introduction/getting-started) - a predictable state container for JavaScript apps
 
-## Authors
+### Authors
 
 * **David van Zyl** - [GitHub](https://github.com/DavidvanZyl)
 
-## License
+### License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
