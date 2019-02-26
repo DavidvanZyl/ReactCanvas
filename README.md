@@ -6,6 +6,8 @@ A webpage with a canvas you can paint on.
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
+(See it in action!)[draw.davidvanzyl.io]
+
 ### Prerequisites
 
 What things you need to install the software and how to install them
